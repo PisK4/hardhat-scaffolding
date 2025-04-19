@@ -1,5 +1,6 @@
 import { network } from "hardhat";
-import { ethers } from "hardhat";
+import { ethers, run } from "hardhat";
+import { verifyContract } from "./utils";
 
 async function main() {
     console.log("Starting deployment of ExampleToken contract...");
@@ -27,9 +28,22 @@ async function main() {
     console.log("- Total Supply:", ethers.formatEther(await token.totalSupply()), "EXT");
     console.log("- Deployer Balance:", ethers.formatEther(await token.balanceOf(deployer.address)), "EXT");
 
-    // Verification parameters
-    console.log("\nVerification Command:");
-    console.log(`npx hardhat verify --network ${network.name} ${tokenAddress} "Example Token" "EXT" ${ethers.parseEther("1000000")}`);
+    const currentChainID = await ethers.provider.getNetwork();
+    console.log("Current chain ID:", currentChainID.chainId);
+
+    // Skip verification on local chain
+    if (currentChainID.chainId == 31337n) {
+        console.log("Skipping verification on local chain");
+        return;
+    }
+
+    // Verify the contract
+    console.log("\nVerifying contract...");
+    await verifyContract(tokenAddress, [
+        "Example Token",
+        "EXT",
+        ethers.parseEther("1000000")
+    ]);
 }
 
 main().catch((error) => {

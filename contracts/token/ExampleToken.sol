@@ -8,17 +8,17 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /**
  * @title ExampleToken
- * @dev 一个示例ERC20代币合约,包含铸币、销毁和暂停功能
+ * @dev a simple ERC20 token with mint, burn and pause functionality
  */
 contract ExampleToken is ERC20, ERC20Burnable, ERC20Pausable, AccessControl {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
 
     /**
-     * @dev 构造函数
-     * @param name 代币名称
-     * @param symbol 代币符号
-     * @param initialSupply 初始供应量
+     * @dev constructor
+     * @param name token name
+     * @param symbol token symbol
+     * @param initialSupply initial supply
      */
     constructor(
         string memory name,
@@ -33,29 +33,34 @@ contract ExampleToken is ERC20, ERC20Burnable, ERC20Pausable, AccessControl {
     }
 
     /**
-     * @dev 铸造新代币
-     * @param to 接收地址
-     * @param amount 铸造数量
+     * @dev mint new tokens
+     * @param to receiver address
+     * @param amount mint amount
      */
     function mint(address to, uint256 amount) public onlyRole(MINTER_ROLE) {
         _mint(to, amount);
     }
 
     /**
-     * @dev 暂停所有代币转移
+     * @dev pause all token transfers
      */
     function pause() public onlyRole(PAUSER_ROLE) {
         _pause();
     }
 
     /**
-     * @dev 恢复代币转移
+     * @dev unpause all token transfers
      */
     function unpause() public onlyRole(PAUSER_ROLE) {
         _unpause();
     }
 
-    // 重写所需的函数
+    /**
+     * @dev override the required functions
+     * @param from sender address
+     * @param to receiver address
+     * @param value transfer amount
+     */
     function _update(address from, address to, uint256 value)
         internal
         override(ERC20, ERC20Pausable)
